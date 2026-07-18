@@ -13,8 +13,8 @@ CORS(app)
 # Database Configuration
 # ==========================
 DB_HOST = os.environ.get("DB_HOST", "YOUR_RDS_ENDPOINT.amazonaws.com")
-DB_USER = os.environ.get("DB_USER", "admin")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "YourSecurePassword123")
+DB_PASSWORD = os.environ.get("DB_PASSWORD", "Guestbook")
+DB_NAME = os.environ.get("DB_NAME", "guestbook")
 DB_NAME = os.environ.get("DB_NAME", "guestbook_db")
 
 
