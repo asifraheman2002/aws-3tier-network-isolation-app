@@ -8,7 +8,7 @@ A production-inspired 3-tier web application deployed on Amazon Web Services (AW
 
 ![Architecture]architecture/architecture.png
 
----
+
 
 ## Project Overview
 
@@ -182,61 +182,60 @@ Request Body
 ## Screenshots
 
 ### Architecture
-```
+
 ![Architecture](architecture/architecture.png)
-```
+
 
 ### Guestbook Home
 
-```
+
 ![Homepage](screenshots/homepage.png)
-```
+
 
 ### Guestbook Entry
 
-```
 ![Guestbook entry](screenshots/guestbook-entry.png)
-```
+
 
 ### AWS EC2 Instances
 
-```
+
 ![EC2](screenshots/ec2.png)
-```
+
 
 ### Amazon RDS
 
-```
+
 ![RDS](screenshots/rds.png)
 
-```
+
 
 ### VPC Architecture
 
-```
+
 ![VPC](screenshots/vpc-subnets-.png)
 
-```
+
 ### NAT Gateway
-```
+
 ![NAT](screenshots/nat-gateway-3tier.png)
 
-```
+
 ### Internet gateway
-```
+
 ![IGW](screenshots/igw-3tier.png)
 
-```
+
 ### web server ssh
-```
-![web server](<screenshots/web-server-ssh connect.png>)
 
-```
+![web-server](screenshots/web-server-ssh.png)
+
+
 ### app server ssh
-```
-![app server ssh](<screenshots/app server through web server.png>)
 
-```
+![app-server](screenshots/app-server-ssh.png)
+
+
 ## Learning Outcomes
 
 - Designed a secure 3-tier AWS architecture
