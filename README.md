@@ -182,11 +182,8 @@ Request Body
 ## Screenshots
 
 ### Architecture
-
-Add:
-
 ```
-![Architecture](architecture/architecture.png)
+architecture/architecture.png
 ```
 
 ### Guestbook Home
