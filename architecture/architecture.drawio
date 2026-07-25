@@ -1,0 +1,24 @@
+aws-3tier-network-isolation-app/
+│
+├── architecture/
+│   ├── aws-3tier-architecture.drawio
+│   └── aws-3tier-architecture.png
+│
+├── backend/
+│   ├── app.py
+│   └── requirements.txt
+│
+├── frontend/
+│   └── index.html
+│
+├── screenshots/
+│   ├── homepage.png
+│   ├── guestbook-entry.png
+│   ├── ec2-instances.png
+│   ├── rds-instance.png
+│   ├── vpc-overview.png
+│   └── security-groups.png
+│
+├── .gitignore
+├── LICENSE
+└── README.md

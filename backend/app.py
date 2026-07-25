@@ -5,182 +5,158 @@ from flask_cors import CORS
 import pymysql
 
 app = Flask(__name__)
-
-# Enable CORS for frontend requests
 CORS(app)
 
 # ==========================
 # Database Configuration
 # ==========================
-DB_HOST = os.environ.get("DB_HOST", "YOUR_RDS_ENDPOINT.amazonaws.com")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "Guestbook")
-DB_NAME = os.environ.get("DB_NAME", "guestbook")
-DB_NAME = os.environ.get("DB_NAME", "guestbook_db")
 
+DB_HOST = os.environ.get(
+    "DB_HOST",
+    "database.cp8wwi4sas3e.ap-south-1.rds.amazonaws.com"
+)
+
+DB_USER = os.environ.get(
+    "DB_USER",
+    "admin"
+)
+
+DB_PASSWORD = os.environ.get(
+    "DB_PASSWORD",
+    "Admin-123"
+)
+
+DB_NAME = os.environ.get(
+    "DB_NAME",
+    "guestbook_db"
+)
 
 # ==========================
 # Database Connection
 # ==========================
+
 def get_db_connection():
     return pymysql.connect(
         host=DB_HOST,
         user=DB_USER,
         password=DB_PASSWORD,
         database=DB_NAME,
-        cursorclass=pymysql.cursors.DictCursor
+        cursorclass=pymysql.cursors.DictCursor,
+        autocommit=True
     )
-
 
 # ==========================
 # Initialize Database
 # ==========================
+
 def init_db():
-    """Create database and table if they don't exist."""
 
-    conn = None
+    conn = pymysql.connect(
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        autocommit=True
+    )
 
-    try:
-        # Create database if it doesn't exist
-        conn = pymysql.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD
+    with conn.cursor() as cursor:
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+
+    conn.close()
+
+    conn = get_db_connection()
+
+    with conn.cursor() as cursor:
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS entries(
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+        """)
 
-        with conn.cursor() as cursor:
-            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
+    conn.close()
 
-        conn.commit()
-
-    finally:
-        if conn:
-            conn.close()
-
-    conn = None
-
-    try:
-        # Create table
-        conn = get_db_connection()
-
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS entries (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    name VARCHAR(100) NOT NULL,
-                    message TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
-
-        conn.commit()
-        print("Database initialized successfully.")
-
-    except Exception as e:
-        print(f"Database Initialization Error: {e}")
-
-    finally:
-        if conn:
-            conn.close()
-
+    print("Database initialized successfully.")
 
 # ==========================
-# Health Check
+# API Routes
 # ==========================
-@app.route("/api/health", methods=["GET"])
-def health_check():
-    return jsonify({
-        "status": "healthy",
-        "tier": "application"
-    }), 200
 
-
-# ==========================
-# Get Guestbook Entries
-# ==========================
 @app.route("/api/entries", methods=["GET"])
 def get_entries():
 
-    conn = None
+    conn = get_db_connection()
 
-    try:
-        conn = get_db_connection()
+    with conn.cursor() as cursor:
 
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                SELECT
-                    name,
-                    message,
-                    DATE_FORMAT(created_at,'%Y-%m-%d %H:%i') AS created_at
-                FROM entries
-                ORDER BY id DESC
-            """)
+        cursor.execute("""
+        SELECT
+            id,
+            name,
+            message,
+            created_at
+        FROM entries
+        ORDER BY id DESC
+        """)
 
-            result = cursor.fetchall()
+        rows = cursor.fetchall()
 
-        return jsonify(result), 200
+    conn.close()
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    finally:
-        if conn:
-            conn.close()
+    return jsonify(rows)
 
 
-# ==========================
-# Add Guestbook Entry
-# ==========================
 @app.route("/api/entries", methods=["POST"])
 def add_entry():
 
     data = request.get_json()
 
     if not data:
-        return jsonify({"error": "Invalid request"}), 400
+        return jsonify({"error":"Invalid JSON"}),400
 
     name = data.get("name")
     message = data.get("message")
 
     if not name or not message:
-        return jsonify({"error": "Name and message are required"}), 400
+        return jsonify({"error":"Name and Message required"}),400
 
-    conn = None
+    conn = get_db_connection()
 
-    try:
-        conn = get_db_connection()
+    with conn.cursor() as cursor:
 
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO entries (name, message)
-                VALUES (%s, %s)
-                """,
-                (name, message)
-            )
+        cursor.execute("""
+        INSERT INTO entries(name,message)
+        VALUES(%s,%s)
+        """,(name,message))
 
-        conn.commit()
+    conn.close()
 
-        return jsonify({
-            "message": "Entry added successfully!"
-        }), 201
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    finally:
-        if conn:
-            conn.close()
+    return jsonify({"message":"Entry added successfully"}),201
 
 
 # ==========================
-# Run Application
+# Health Check
 # ==========================
+
+@app.route("/")
+def health():
+    return "Guestbook API Running"
+
+
+# ==========================
+# Main
+# ==========================
+
 if __name__ == "__main__":
 
-    # Wait for RDS to become available
+    print("Initializing database...")
     time.sleep(2)
 
     init_db()
+
+    print("Guestbook Application Started")
 
     app.run(
         host="0.0.0.0",

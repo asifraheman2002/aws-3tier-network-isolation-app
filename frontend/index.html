@@ -3,103 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3-Tier Guestbook</title>
+    <title>AWS 3-Tier Guestbook</title>
+
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.6; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input[type="text"], textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        .entry { background: #f4f4f4; padding: 10px; margin-top: 10px; border-left: 5px solid #007bff; border-radius: 4px; }
+        body{
+            font-family: Arial, sans-serif;
+            max-width:700px;
+            margin:40px auto;
+            padding:20px;
+            background:#f5f5f5;
+        }
+
+        h2{
+            color:#0077cc;
+        }
+
+        .card{
+            background:#fff;
+            padding:20px;
+            border-radius:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,.1);
+        }
+
+        label{
+            display:block;
+            margin-top:10px;
+            font-weight:bold;
+        }
+
+        input,textarea{
+            width:100%;
+            padding:10px;
+            margin-top:5px;
+            border:1px solid #ccc;
+            border-radius:5px;
+            box-sizing:border-box;
+        }
+
+        button{
+            margin-top:15px;
+            padding:10px 20px;
+            border:none;
+            background:#0077cc;
+            color:white;
+            border-radius:5px;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#005fa3;
+        }
+
+        .entry{
+            margin-top:15px;
+            padding:15px;
+            background:white;
+            border-left:5px solid #0077cc;
+            border-radius:5px;
+        }
+
+        small{
+            color:gray;
+        }
     </style>
 </head>
+
 <body>
 
-    <h2>📝 3-Tier Architecture Guestbook</h2>
-    <p>Testing connectivity from Browser → Web Server → App Server → RDS MySQL.</p>
+<h2>📝 AWS 3-Tier Architecture Guestbook</h2>
 
-    <!-- Form to add new signature -->
-    <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-        <h3>Sign the Guestbook</h3>
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" placeholder="Your Name">
-        </div>
-        <div class="form-group">
-            <label for="message">Message:</label>
-            <textarea id="message" rows="3" placeholder="Leave a message..."></textarea>
-        </div>
-        <button onclick="submitData()">Submit to Backend</button>
-    </div>
+<p>
+Browser ➜ Apache Web Server ➜ Flask App Server ➜ Amazon RDS MySQL
+</p>
 
-    <h3>Recent Signatures</h3>
-    <div id="guestbook-entries">Loading entries...</div>
+<div class="card">
 
-    <script>
-        // CHANGE THIS: Replace with your Internal Application Load Balancer DNS 
-        // or the Private IP of your App Server if testing directly within the VPC.
-        const API_BASE_URL = "http://YOUR_APP_SERVER_IP_OR_ALB_DNS:5000";
+<h3>Sign Guestbook</h3>
 
-        // Fetch signatures on load
-        async function fetchEntries() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/entries`);
-                const data = await response.json();
-                const container = document.getElementById('guestbook-entries');
-                container.innerHTML = '';
-                
-                if (data.length === 0) {
-                    container.innerHTML = '<p>No entries yet. Be the first!</p>';
-                    return;
-                }
+<label>Name</label>
+<input type="text" id="name" placeholder="Enter your name">
 
-                data.forEach(entry => {
-                    const div = document.createElement('div');
-                    div.className = 'entry';
-                    div.innerHTML = `<strong>${escapeHtml(entry.name)}</strong>: ${escapeHtml(entry.message)} <br><small style="color:gray;">${entry.created_at}</small>`;
-                    container.appendChild(div);
-                });
-            } catch (error) {
-                document.getElementById('guestbook-entries').innerHTML = `<p style="color:red;">Error connecting to App Server: ${error.message}</p>`;
-            }
+<label>Message</label>
+<textarea id="message" rows="4" placeholder="Write your message"></textarea>
+
+<button onclick="submitData()">Submit</button>
+
+</div>
+
+<h3>Guestbook Entries</h3>
+
+<div id="guestbook-entries">
+Loading...
+</div>
+
+<script>
+
+async function fetchEntries(){
+
+    try{
+
+        const response = await fetch("/api/entries");
+
+        const data = await response.json();
+
+        const container = document.getElementById("guestbook-entries");
+
+        container.innerHTML="";
+
+        if(data.length===0){
+
+            container.innerHTML="<p>No Guestbook Entries.</p>";
+            return;
         }
 
-        // Submit a new signature
-        async function submitData() {
-            const name = document.getElementById('name').value;
-            const message = document.getElementById('message').value;
+        data.forEach(entry=>{
 
-            if (!name || !message) {
-                alert('Please fill out both fields');
-                return;
-            }
+            container.innerHTML += `
+            <div class="entry">
+                <strong>${escapeHtml(entry.name)}</strong><br>
+                ${escapeHtml(entry.message)}
+                <br>
+                <small>${entry.created_at}</small>
+            </div>
+            `;
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/entries`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, message })
-                });
-                
-                if (response.ok) {
-                    document.getElementById('name').value = '';
-                    document.getElementById('message').value = '';
-                    fetchEntries(); // Refresh list
-                } else {
-                    alert('Failed to save entry.');
-                }
-            } catch (error) {
-                alert(`Error: ${error.message}`);
-            }
-        }
+        });
 
-        function escapeHtml(str) {
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
+    }
 
-        // Initial load
+    catch(error){
+
+        document.getElementById("guestbook-entries").innerHTML =
+        `<p style="color:red;">${error}</p>`;
+
+    }
+
+}
+
+async function submitData(){
+
+    const name=document.getElementById("name").value;
+
+    const message=document.getElementById("message").value;
+
+    if(!name || !message){
+
+        alert("Please enter Name and Message");
+
+        return;
+    }
+
+    const response=await fetch("/api/entries",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            name:name,
+            message:message
+
+        })
+
+    });
+
+    if(response.ok){
+
+        document.getElementById("name").value="";
+
+        document.getElementById("message").value="";
+
         fetchEntries();
-    </script>
+
+    }
+
+    else{
+
+        alert("Unable to save data.");
+
+    }
+
+}
+
+function escapeHtml(text){
+
+    return text
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+
+}
+
+fetchEntries();
+
+</script>
+
 </body>
 </html>
