@@ -183,7 +183,7 @@ Request Body
 
 ### Architecture
 ```
-architecture/architecture.png
+![Architecture](architecture/architecture.png)
 ```
 
 ### Guestbook Home
