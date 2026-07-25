@@ -226,13 +226,11 @@ Request Body
 
 
 ### web server ssh
-
-![Webserver](screenshots/web-server-ssh.png)
-
+![Webserver](screenshots/webserver.png)
 
 ### app server ssh
 
-![Appserver](screenshots/app-server-ssh.png)
+![Appserver](screenshots/appserver.png)
 
 
 ## Learning Outcomes
