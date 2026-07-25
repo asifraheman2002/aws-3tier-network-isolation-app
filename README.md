@@ -2,12 +2,11 @@
 
 A production-inspired 3-tier web application deployed on Amazon Web Services (AWS) using Apache, Flask, and Amazon RDS MySQL, demonstrating secure network isolation, reverse proxy configuration, and multi-tier application architecture.
 
----
+
 
 ## Architecture
 
-![Architecture]architecture/architecture.png
-
+![Architchture](architecture/architecture.png)
 
 
 ## Project Overview
@@ -228,12 +227,12 @@ Request Body
 
 ### web server ssh
 
-![web-server](screenshots/web-server-ssh.png)
+![Webserver](screenshots/web-server-ssh.png)
 
 
 ### app server ssh
 
-![app-server](screenshots/app-server-ssh.png)
+![Appserver](screenshots/app-server-ssh.png)
 
 
 ## Learning Outcomes
