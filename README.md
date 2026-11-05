@@ -398,7 +398,7 @@ The following capabilities are potential improvements and are not presented as i
 MCA Student | Aspiring Cloud / AWS Engineer
 
 - GitHub: [asifraheman2002](https://github.com/asifraheman2002)
-- LinkedIn: [SK Asif Raheman](https://www.linkedin.com/in/sk-asif-raheman/)
+- LinkedIn: [Sk Asif Raheman](https://www.linkedin.com/in/sk-asif-raheman/)
 
 ## License
 
